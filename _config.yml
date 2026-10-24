@@ -1,0 +1,3 @@
+# שפע יואל - דפי השפות וההצטרפות. GitHub Pages בונה את האתר לבד (Jekyll), וממלא את כתובת האתר המלאה בתגיות התצוגה.
+title: שפע יואל
+exclude: [README.md, build_pages.py]

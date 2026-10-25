@@ -1,14 +1,20 @@
-// גרסה 2 - 2026-10-25 - משימה יג: כפתור הצטרפות גדול ובולט "הצטרפו לקבלת המסר היומי מענינא דיומא" (בדף יום - גם למעלה בקטן). (1: דפי השפות וההצטרפות, רק הודעות שפורסמו)
+// גרסה 3 - 2026-10-25 - משימה יג-ד: דפים לפי מספר רץ (/y/12, /e/12) - api=pub&n=; הדפים לפי תאריך (/y/DDMM) ממשיכים לעבוד; נוסח כפתור ההצטרפות מאושר. (2: משימה יג: כפתור הצטרפות גדול ובולט "הצטרפו לקבלת המסר היומי מענינא דיומא" (בדף יום - גם למעלה בקטן). (1: דפי השפות וההצטרפות, רק הודעות שפורסמו)
 (function () {
   var app = document.getElementById('app');
-  var kind = app.getAttribute('data-kind'), l = app.getAttribute('data-lang'), ddmm = app.getAttribute('data-ddmm');
-  // הכתובת עצמה קובעת את היום (גם אם נפתח /y/2610 בלי .html)
-  var m = location.pathname.match(/\/([ye])\/(\d{4})(?:\.html)?\/?$/);
-  if (m) { l = m[1]; ddmm = m[2]; }
-  // לפי המילון (גרסה 6). היידיש והאנגלית - חדשים, לאישור דבורה
+  var kind = app.getAttribute('data-kind'), l = app.getAttribute('data-lang'), ddmm = app.getAttribute('data-ddmm'), num = app.getAttribute('data-n') || '';
+  // הכתובת עצמה קובעת (גם אם נפתח /y/12 או /y/2610 בלי .html): מספר רץ 1-2000 (בלי אפס בהתחלה), ו/או תאריך DDMM
+  var m = location.pathname.match(/\/([ye])\/(\d{1,4})(?:\.html)?\/?$/);
+  if (m) {
+    l = m[1];
+    num = /^[1-9]\d*$/.test(m[2]) && +m[2] <= 2000 ? m[2] : '';
+    var dd = +m[2].slice(0, 2), mm = +m[2].slice(2);
+    ddmm = m[2].length === 4 && mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31 ? m[2] : '';
+  }
+  // לפי המילון (גרסה 7 - מאושר)
   var JOIN = { h: 'הצטרפו לקבלת המסר היומי מענינא דיומא', y: 'שליסט אייך אן צו באקומען דעם טעגליכן מסר פון ענינא דיומא', e: "Join to receive the daily message of Inyana D'Yoma" };
   var WAIT = { h: 'טוען...', y: 'טוען...', e: 'Loading...' };
   var NONE = { y: 'עוד לא פורסם.', e: 'Not published yet.' };
+  var NONUM = { y: 'הודעה מספר {n} עוד לא פורסמה.', e: 'Message {n} has not been published yet.' };
   var NOCH = { h: 'הערוץ עוד לא הוגדר.', y: 'הערוץ עוד לא הוגדר.', e: 'The channel is not set up yet.' };
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -72,9 +78,16 @@
     var top = document.createElement('div'); top.id = 'joinTop';
     box.parentNode.insertBefore(top, box);
     joinBtn(l, function (h) { top.innerHTML = h; }, true);
-    load('api=pub&l=' + l + '&d=' + ddmm, function (d) {
-      box.innerHTML = d && d.ok ? '<div class="card">' + render(d.text) + '</div>' : '<p class="wait">' + NONE[l] + '</p>';
+    var show = function (d, none) { box.innerHTML = d && d.ok ? '<div class="card">' + render(d.text) + '</div>' : '<p class="wait">' + none + '</p>'; };
+    var byDate = function () { load('api=pub&l=' + l + '&d=' + ddmm, function (d) { show(d, NONE[l]); }); };
+    // קודם לפי המספר; שם שהוא גם תאריך (למשל 1501) ואין בו הודעה במספר - לפי התאריך, כמו בקישורים הישנים
+    if (num) load('api=pub&l=' + l + '&n=' + num, function (d) {
+      if (d && d.ok) show(d);
+      else if (ddmm) byDate();
+      else show(null, NONUM[l].replace('{n}', num));
     });
+    else if (ddmm) byDate();
+    else show(null, NONE[l]);
     joinBtn(l, function (h) { jb.innerHTML = h; });
   }
 })();

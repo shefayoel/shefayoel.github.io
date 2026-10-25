@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- // גרסה 1 - 2026-10-24 - דפי השפות וההצטרפות של שפע יואל (GitHub Pages). התוכן נקרא מה-Web app, ומופיע רק אחרי "פורסם" -->
+<!-- // גרסה 2 - 2026-10-25 - משימה יג-ד: data-n (מספר רץ) לצד data-ddmm. (1: דפי השפות וההצטרפות של שפע יואל (GitHub Pages). התוכן נקרא מה-Web app, ומופיע רק אחרי "פורסם") -->
 <html lang="{{ page.htmllang | default: 'he' }}" dir="{{ page.dir | default: 'rtl' }}">
 <head>
 <meta charset="utf-8">
@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="{{ site.baseurl }}/assets/site.css">
 </head>
 <body>
-<main id="app" data-kind="{{ page.kind }}" data-lang="{{ page.l }}" data-ddmm="{{ page.ddmm }}">{{ content }}</main>
+<main id="app" data-kind="{{ page.kind }}" data-lang="{{ page.l }}" data-ddmm="{{ page.ddmm }}" data-n="{{ page.n }}">{{ content }}</main>
 <script src="{{ site.baseurl }}/assets/config.js"></script>
 <script src="{{ site.baseurl }}/assets/site.js"></script>
 </body>
